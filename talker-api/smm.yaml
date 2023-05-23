@@ -1,0 +1,11 @@
+apiVersion: maistra.io/v1
+kind: ServiceMeshMember
+metadata:
+  name: default
+  namespace: talker-api
+  labels:
+    app: talker-api
+spec:
+  controlPlaneRef:
+    namespace: istio-system
+    name: basic

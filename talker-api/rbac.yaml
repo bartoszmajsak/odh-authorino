@@ -1,0 +1,47 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: talker-api-full
+  namespace: talker-api
+rules:
+- apiGroups:
+  - talker-api
+  resources:
+  - services
+  verbs:
+  - get
+  - post
+  - put
+  - patch
+  - delete
+  - options
+  - head
+  - connect
+  - trace
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: talker-api-listener
+  namespace: talker-api
+rules:
+- apiGroups:
+  - talker-api
+  resources:
+  - services
+  verbs:
+  - get
+  - head
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: talker-api-listeners
+  namespace: talker-api
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: talker-api-listener
+subjects:
+- kind: ServiceAccount
+  name: talker-api-bff

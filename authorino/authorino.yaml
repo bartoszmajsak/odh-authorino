@@ -1,0 +1,15 @@
+apiVersion: operator.authorino.kuadrant.io/v1beta1
+kind: Authorino
+metadata:
+  name: authorino
+  namespace: $AUTH_NS
+spec:
+  image: quay.io/kuadrant/authorino:text-plain-response
+  authConfigLabelSelectors: authorino/topic in (odh talker-api)
+  clusterWide: true
+  listener:
+    tls:
+      enabled: false
+  oidcServer:
+    tls:
+      enabled: false

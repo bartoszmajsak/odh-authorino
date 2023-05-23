@@ -1,0 +1,19 @@
+kind: AuthorizationPolicy
+apiVersion: security.istio.io/v1beta1
+metadata:
+  name: talker-api-ext-authz
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  action: CUSTOM
+  provider:
+    name: auth-provider
+  rules:
+  - to:
+    - operation:
+        hosts:
+        - talker-api.apps.$CLUSTER_DOMAIN
+        notPaths:
+        - /oauth/callback
