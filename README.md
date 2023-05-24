@@ -83,6 +83,21 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   ```
 </details>
 
+<details>
+  <summary>⑥ Store useful OAuth endpoints in the shell</summary>
+
+  <br/>
+
+  > ⚠️ This step is important for other parts of the tutorial further below. Do not skip it.
+
+  ```sh
+  endpoint=$(kubectl -n default run oidc-config --attach --rm --restart=Never -q --image=curlimages/curl -- https://kubernetes.default.svc/.well-known/oauth-authorization-server -sS -k)
+
+  export AUTH_ENDPOINT=$(echo $endpoint | jq -r .authorization_endpoint)
+  export TOKEN_ENDPOINT=$(echo $endpoint | jq -r .token_endpoint)
+  ```
+</details>
+
 ### Try with a sample application first
 
 <details>
@@ -91,8 +106,6 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   <br/>
 
   ```sh
-  endpoint=$(kubectl -n default run oidc-config --attach --rm --restart=Never -q --image=curlimages/curl -- https://kubernetes.default.svc/.well-known/oauth-authorization-server -sS -k)
-  export AUTH_ENDPOINT=$(echo $endpoint | jq -r .authorization_endpoint)
   make talker-api | kubectl apply -f -
   ```
 </details>
@@ -149,9 +162,8 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   🅱 Finish the OAuth flow in the terminal:
 
   ```sh
-  export TOKEN_ENDPOINT=$(echo $endpoint | jq -r .token_endpoint)
   export OAUTH_CLIENT_SECRET=$(kubectl get $(kubectl get secrets -n talker-api -o name | grep talker-api-bff-token) -n talker-api -o jsonpath='{.data.token}' | base64 -d)
-  export ACCESS_TOKEN=$(curl -d client_id=system:serviceaccount:talker-api:talker-api-bff \
+  export ACCESS_TOKEN=$(curl -S -d client_id=system:serviceaccount:talker-api:talker-api-bff \
       -d client_secret=$OAUTH_CLIENT_SECRET \
       -d redirect_uri=http://talker-api.apps.${CLUSTER_DOMAIN}/oauth/callback \
       -d grant_type=authorization_code \
