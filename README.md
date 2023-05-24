@@ -75,7 +75,7 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   kubectl patch smcp/basic -n istio-system --type merge -p "{\"spec\":{\"techPreview\":{\"meshConfig\":{\"extensionProviders\":[{\"name\":\"auth-provider\",\"envoyExtAuthzGrpc\":{\"service\":\"authorino-authorino-authorization.$AUTH_NS.svc.cluster.local\",\"port\":50051}}]}}}}"
   ```
 
-  Avoid injecting the sidecar proxy in the Authorino container: _(Optional)_
+  _(Optional)_ Avoid injecting the sidecar proxy in the Authorino container:
 
   ```sh
   kubectl wait --for condition=Available deployment/authorino --timeout 300s -n authorino
@@ -132,6 +132,17 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   # HTTP/1.1 403 Forbidden
   ```
 
+  _(Optional)_ Inspect the token:
+
+  ```sh
+  kubectl create -o json -f -<<EOF
+  apiVersion: authentication.k8s.io/v1
+  kind: TokenReview
+  spec:
+    token: $(oc whoami -t)
+  EOF
+  ```
+
   Check that the callback endpoint skips the authorization:
 
   > This will be useful in another step further below, when simulating a webapp (frontend + backend for frontend) that consumes the API.
@@ -178,6 +189,17 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   curl -H "Authorization: Bearer $ACCESS_TOKEN" http://talker-api.apps.$CLUSTER_DOMAIN -I
   # HTTP/1.1 200 OK
   ```
+
+  _(Optional)_ Inspect the token:
+
+  ```sh
+  kubectl create -o json -f -<<EOF
+  apiVersion: authentication.k8s.io/v1
+  kind: TokenReview
+  spec:
+    token: $ACCESS_TOKEN
+  EOF
+  ```
 </details>
 
 <details>
@@ -208,6 +230,21 @@ This is a Proof of Concept of protecting [Open Data Hub](https://opendatahub.io/
   ```sh
   curl -H "Authorization: Bearer $SA_TOKEN" http://talker-api.apps.$CLUSTER_DOMAIN -I -X POST
   # HTTP/1.1 403 Forbidden
+  ```
+
+  _(Optional)_ Inspect the token:
+
+  ```sh
+  kubectl create -o json -f -<<EOF
+  apiVersion: authentication.k8s.io/v1
+  kind: TokenReview
+  spec:
+    token: $SA_TOKEN
+  EOF
+  ```
+
+  ```sh
+  jq -R 'split(".") | .[0],.[1] | @base64d | fromjson' <<< $(echo "$SA_TOKEN")
   ```
 </details>
 
