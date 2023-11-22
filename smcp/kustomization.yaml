@@ -6,3 +6,4 @@ resources:
 - namespace.yaml
 - cert-secret.yaml
 - smcp.yaml
+- route.yaml

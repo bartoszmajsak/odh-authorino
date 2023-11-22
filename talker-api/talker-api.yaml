@@ -18,8 +18,6 @@ spec:
     metadata:
       labels:
         app: talker-api
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: talker-api

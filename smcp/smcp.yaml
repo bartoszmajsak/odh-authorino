@@ -4,9 +4,17 @@ metadata:
   name: basic
   namespace: istio-system
 spec:
-  version: v2.3
+  techPreview:
+    meshConfig:
+      extensionProviders:
+      - name: auth-provider
+        envoyExtAuthzGrpc:
+          service: authorino-authorino-authorization.auth-provider.svc.cluster.local
+          port: 50051
   proxy:
     injection:
+      # Setting it to false will enforce deployments need to have sidecar.istio.io/inject label set to "true"
+      # There are deployments out of our control, such as Authorino's
       autoInject: true
     runtime:
       container:
@@ -17,15 +25,19 @@ spec:
           limits:
             cpu: 500m
             memory: 129Mi
+  gateways:
+    openshiftRoute:
+      # To control the routes we create instead of letting IOR to create routes automatically for each and every Istio Gateway created
+      enabled: false
   tracing:
-    type: Jaeger
-    sampling: 10000
+    type: None
   addons:
+    grafana:
+      enabled: false
+    kiali:
+      name: kiali
+      enabled: false
+    prometheus:
+      enabled: false
     jaeger:
       name: jaeger
-      install:
-        storage:
-          type: Memory
-    kiali:
-      enabled: true
-      name: kiali

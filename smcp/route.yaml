@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: opendatahub-ingressgateway
+  namespace: istio-system
+spec:
+  host: opendatahub.apps.$CLUSTER_DOMAIN
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough
+  wildcardPolicy: None

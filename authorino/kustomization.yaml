@@ -4,6 +4,3 @@ resources:
 - namespace.yaml
 - authorino.yaml
 - smm.yaml
-
-# Patch AuthConfig CRD until https://github.com/Kuadrant/authorino/pull/393 is merged and released with the Operator
-- authconfig-crd-patch.yaml

@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+- smm.yaml
 - talker-api.yaml
 - gateway.yaml
 - authpolicy.yaml
 - authconfig.yaml
-- smm.yaml
 - serviceaccount.yaml
 - rbac.yaml

@@ -7,7 +7,7 @@ metadata:
     authorino/topic: talker-api
 spec:
   hosts:
-  - talker-api.apps.$CLUSTER_DOMAIN
+  - opendatahub.apps.$CLUSTER_DOMAIN
 
   identity:
   - name: kubernetes-users
@@ -17,14 +17,10 @@ spec:
 
   authorization:
   - name: k8s-rbac
-    when:
-    - selector: auth.identity.extra.scopes\.authorization\.openshift\.io
-      operator: excl
-      value: role:talker-api-full:talker-api
     kubernetes:
       user:
         valueFrom:
-          authJSON: auth.identity.sub
+          authJSON: auth.identity.username
       resourceAttributes:
         namespace:
           value: talker-api
@@ -33,19 +29,19 @@ spec:
         resource:
           value: services
         verb:
-          valueFrom:
-            authJSON: context.request.http.method.@case:lower
+          value: get
 
   response:
-  - name: x-forwarded-access-token
-    plain:
-      valueFrom:
-        authJSON: context.request.http.headers.authorization.@extract:{"pos":1}
-
+  - name: x-auth-data
+    json:
+      properties:
+      - name: username
+        valueFrom: { authJSON: auth.identity.username }
+  
   denyWith:
-    unauthenticated:
-      code: 302
-      headers:
-      - name: Location
-        valueFrom:
-          authJSON: "${AUTH_ENDPOINT}?client_id=system%3Aserviceaccount%3Atalker-api%3Atalker-api-bff&redirect_uri=http%3A%2F%2Ftalker-api.apps.${CLUSTER_DOMAIN}%2Foauth%2Fcallback&response_type=code&scope=user%3Ainfo%20role%3Atalker-api-full%3Atalker-api&state={context.request.http.id}"
+    unauthenticated:      
+      message:
+        value: "Access denied"
+    unauthorized:
+      message:
+        value: "Unauthorized :("
